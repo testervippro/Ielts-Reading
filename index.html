@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>IELTS Reading Practice</title>
+
+<style>
+body {
+  font-family: Arial;
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+a {
+  display: block;
+  padding: 10px;
+  background: #f4f4f4;
+  text-decoration: none;
+  border-radius: 6px;
+  text-align: center;
+}
+
+a:hover {
+  background: #ddd;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📚 IELTS Reading Practice</h1>
+
+<div id="list" class="grid"></div>
+
+<script>
+const container = document.getElementById("list");
+
+// generate CAM 10 → 20, TEST 1 → 4
+for (let cam = 10; cam <= 20; cam++) {
+  for (let test = 1; test <= 4; test++) {
+    const filename = `cleaned_cam${cam}_test${test}.html`;
+
+    const a = document.createElement("a");
+    a.href = filename;
+    a.textContent = `Cam ${cam} - Test ${test}`;
+
+    container.appendChild(a);
+  }
+}
+</script>
+
+</body>
+</html>
