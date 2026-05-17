@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<title>Quiz Vocabulary</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f4f4f4;
+    padding: 30px;
+    text-align: center;
+}
+
+.quiz-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+button {
+    padding: 10px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.option { margin: 5px 0; }
+
+#starBtn { cursor:pointer; font-size:22px; }
+</style>
+</head>
+
+<body>
+
+<h2>📘 Quiz Vocabulary</h2>
+
+<!-- INPUT -->
+<div id="inputSection">
+    <input type="file" id="csvFile" accept=".csv"><br><br>
+
+    <textarea id="csvText" rows="6" style="width:100%" placeholder="apple,táo"></textarea>
+    <button onclick="loadFromText()">Load Quiz</button>
+
+    <label id="autoNextLabel">
+        <input type="checkbox" id="autoNext" checked>
+        Auto next
+    </label>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="quiz-container" style="display:none">
+
+<div id="progress"></div>
+
+<div style="display:flex;justify-content:center;gap:10px;">
+    <h3 id="question"></h3>
+    <span id="starBtn">☆</span>
+</div>
+
+<div id="options"></div>
+
+<button id="nextBtn" onclick="nextQuestion()">Next</button>
+
+<div id="score"></div>
+
+<button onclick="showFavorites()">⭐ Favorites</button>
+<button onclick="showWrong()">❌ Wrong</button>
+
+<div id="favBox"></div>
+<div id="wrongBox"></div>
+
+</div>
+
+<script>
+
+// ================= STATE =================
+let quizData = [];
+let currentQuestion = 0;
+let score = 0;
+let selectedIndex = 0;
+
+let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+let wrongWords = JSON.parse(localStorage.getItem("wrongWords") || "[]");
+
+// ================= LOAD =================
+csvFile.onchange = e=>{
+    const reader = new FileReader();
+    reader.onload = e=>startQuiz(e.target.result);
+    reader.readAsText(e.target.files[0]);
+};
+
+function loadFromText(){
+    if (!csvText.value.trim()) return alert("Paste CSV!");
+    startQuiz(csvText.value);
+}
+
+// ================= START =================
+function startQuiz(text){
+
+    parseCSV(text);
+    shuffle(quizData);
+
+    currentQuestion = 0;
+    score = 0;
+
+    inputSection.style.display = "none";
+    quiz.style.display = "block";
+    autoNextLabel.style.display = "none";
+
+    loadQuestion();
+}
+
+// ================= CSV =================
+function parseCSV(data){
+
+    quizData = data.split("\n")
+    .map(l=>l.trim())
+    .filter(Boolean)
+    .map(l=>{
+        const p = l.split(",");
+        return {question:p[0], correct:p[1]};
+    });
+
+    quizData.forEach(q=>{
+        const wrong = quizData
+            .filter(x=>x.correct!==q.correct)
+            .map(x=>x.correct);
+
+        shuffle(wrong);
+        q.options = [q.correct,...wrong.slice(0,3)];
+        shuffle(q.options);
+    });
+}
+
+// ================= LOAD Q =================
+function loadQuestion(){
+
+    const q = quizData[currentQuestion];
+
+    question.innerText = q.question;
+    progress.innerText = `${currentQuestion+1}/${quizData.length}`;
+
+    options.innerHTML = "";
+    selectedIndex = 0;
+
+    q.options.forEach(opt=>{
+        const btn = document.createElement("button");
+        btn.className = "option";
+        btn.innerText = opt;
+
+        btn.onclick = ()=>checkAnswer(opt);
+
+        options.appendChild(btn);
+    });
+
+    updateStar();
+    highlight();
+}
+
+// ================= CHECK =================
+function checkAnswer(selected){
+
+    const correct = quizData[currentQuestion].correct;
+
+    if (selected === correct){
+        score++;
+    } else {
+
+        // 🔥 lưu wrong
+        const cur = quizData[currentQuestion];
+
+        if (!wrongWords.find(x=>x.question===cur.question)){
+            wrongWords.push({
+                question: cur.question,
+                correct: cur.correct
+            });
+            localStorage.setItem("wrongWords", JSON.stringify(wrongWords));
+        }
+    }
+
+    document.querySelectorAll(".option").forEach(btn=>{
+        btn.disabled = true;
+
+        if (btn.innerText === correct)
+            btn.style.background = "lightgreen";
+        else if (btn.innerText === selected)
+            btn.style.background = "salmon";
+    });
+
+    if (autoNext.checked){
+        setTimeout(nextQuestion,800);
+    } else {
+        nextBtn.style.display = "block";
+    }
+}
+
+// ================= NEXT =================
+function nextQuestion(){
+    currentQuestion++;
+    if (currentQuestion < quizData.length){
+        loadQuestion();
+    } else showResult();
+}
+
+// ================= RESULT =================
+function showResult(){
+
+    question.innerText = "Finished!";
+    options.innerHTML = "";
+    progress.innerText = "";
+
+    score.innerText = `Score: ${score}/${quizData.length}`;
+
+    const retry = document.createElement("button");
+    retry.innerText = "Retry";
+
+    retry.onclick = ()=>{
+        inputSection.style.display = "block";
+        quiz.style.display = "none";
+        autoNextLabel.style.display = "block";
+        retry.remove();
+    };
+
+    quiz.appendChild(retry);
+}
+
+// ================= STAR =================
+starBtn.onclick = ()=>{
+    const cur = quizData[currentQuestion];
+
+    const exist = favorites.find(x=>x.question===cur.question);
+
+    if (exist){
+        favorites = favorites.filter(x=>x.question!==cur.question);
+    } else {
+        favorites.push(cur);
+    }
+
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    updateStar();
+};
+
+function updateStar(){
+    const cur = quizData[currentQuestion];
+    starBtn.innerText =
+        favorites.find(x=>x.question===cur.question) ? "⭐" : "☆";
+}
+
+// ================= FAVORITES =================
+function showFavorites(){
+
+    favBox.innerHTML = "<h3>Favorites</h3>";
+
+    favorites.forEach(f=>{
+        const div = document.createElement("div");
+        div.innerText = `${f.question} - ${f.correct}`;
+        favBox.appendChild(div);
+    });
+
+    const btn = document.createElement("button");
+    btn.innerText = "Quiz Favorites";
+
+    btn.onclick = ()=>{
+        quizData = JSON.parse(JSON.stringify(favorites));
+        shuffle(quizData);
+        currentQuestion = 0;
+        score = 0;
+        loadQuestion();
+    };
+
+    favBox.appendChild(btn);
+}
+
+// ================= WRONG =================
+function showWrong(){
+
+    wrongBox.innerHTML = "<h3>Wrong Words</h3>";
+
+    wrongWords.forEach(w=>{
+        const div = document.createElement("div");
+        div.innerText = `${w.question} - ${w.correct}`;
+        wrongBox.appendChild(div);
+    });
+
+    const btn = document.createElement("button");
+    btn.innerText = "Quiz Wrong Words";
+
+    btn.onclick = ()=>{
+        quizData = JSON.parse(JSON.stringify(wrongWords));
+        shuffle(quizData);
+        currentQuestion = 0;
+        score = 0;
+        loadQuestion();
+    };
+
+    const clear = document.createElement("button");
+    clear.innerText = "Clear";
+
+    clear.onclick = ()=>{
+        wrongWords = [];
+        localStorage.removeItem("wrongWords");
+        wrongBox.innerHTML = "";
+    };
+
+    wrongBox.appendChild(btn);
+    wrongBox.appendChild(clear);
+}
+
+// ================= UTIL =================
+function shuffle(arr){
+    for (let i=arr.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+}
+
+// ================= KEYBOARD =================
+document.addEventListener("keydown", e=>{
+
+    const opts = document.querySelectorAll(".option");
+    if (!opts.length) return;
+
+    if (e.key === "q"){
+        selectedIndex = (selectedIndex+1)%opts.length;
+        highlight();
+    }
+
+    if (e.key === "Enter"){
+        opts[selectedIndex].click();
+    }
+});
+
+function highlight(){
+    document.querySelectorAll(".option").forEach((b,i)=>{
+        b.style.border = i===selectedIndex ? "2px solid blue" : "";
+    });
+}
+
+</script>
+
+</body>
+</html>
