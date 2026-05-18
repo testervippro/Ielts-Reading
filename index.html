@@ -1,67 +1,182 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<title>IELTS Reading Practice</title>
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>IELTS & Japanese Reading</title>
 
 <style>
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-  font-family: Arial;
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
+    margin: 0;
+    padding: 40px;
+    font-family: Arial, sans-serif;
+    background: #ffffff;
+    color: #000000;
 }
 
 h1 {
-  text-align: center;
+    margin-top: 0;
+    margin-bottom: 32px;
+    font-size: 36px;
+}
+
+.section-title {
+    margin-top: 48px;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.nav-container,
+.grid {
+    display: grid;
+    gap: 16px;
+}
+
+.nav-container {
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(240px, 1fr)
+    );
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(220px, 1fr)
+    );
 }
 
-a {
-  display: block;
-  padding: 10px;
-  background: #f4f4f4;
-  text-decoration: none;
-  border-radius: 6px;
-  text-align: center;
+.card {
+    display: block;
+    padding: 16px 20px;
+    border: 2px solid #000;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #000;
+    font-weight: 600;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
 }
 
-a:hover {
-  background: #ddd;
+.card:hover {
+    background: #000;
+    color: #fff;
+    transform: translateY(-2px);
 }
+
+.footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 2px solid #000;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+
+    body {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+}
+
 </style>
+
 </head>
 
 <body>
 
-<h1>📚 IELTS Reading Practice</h1>
+<h1>📚 IELTS & Japanese Reading Library</h1>
 
-<a href="listening_cam10_20.html" class="nav-link">
-        Listening Cam 10-20</a>
-  
-<div id="list" class="grid"></div>
+<!-- ========================= -->
+<!-- Navigation -->
+<!-- ========================= -->
+
+<div class="nav-container">
+
+    <a
+        href="listening_cam10_20.html"
+        class="card"
+    >
+        🎧 Listening Cam 10–20
+    </a>
+
+    <a
+        href="n5_reading.pdf"
+        target="_blank"
+        class="card"
+    >
+        🇯🇵 N5 Reading PDF
+    </a>
+
+    <a
+        href="n4_reading.pdf"
+        target="_blank"
+        class="card"
+    >
+        🇯🇵 N4 Reading PDF
+    </a>
+
+</div>
+
+<!-- ========================= -->
+<!-- IELTS Reading -->
+<!-- ========================= -->
+
+<h2 class="section-title">
+    IELTS Reading Practice
+</h2>
+
+<div id="reading-list" class="grid"></div>
 
 <script>
-const container = document.getElementById("list");
 
-// generate CAM 10 → 20, TEST 1 → 4
+const container =
+    document.getElementById("reading-list");
+
+// Generate CAM 10 → 20
 for (let cam = 10; cam <= 20; cam++) {
-  for (let test = 1; test <= 4; test++) {
-    const filename = `cleaned_cam${cam}_test${test}.html`;
 
-    const a = document.createElement("a");
-    a.href = filename;
-    a.textContent = `Cam ${cam} - Test ${test}`;
+    for (let test = 1; test <= 4; test++) {
 
-    container.appendChild(a);
-  }
+        const filename =
+            `cleaned_cam${cam}_test${test}.html`;
+
+        const a =
+            document.createElement("a");
+
+        a.href = filename;
+
+        a.className = "card";
+
+        a.textContent =
+            `📖 Cam ${cam} - Test ${test}`;
+
+        container.appendChild(a);
+    }
 }
+
 </script>
+
+<div class="footer">
+    IELTS Practice & Japanese Reading Materials
+</div>
 
 </body>
 </html>
