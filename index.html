@@ -28,14 +28,14 @@ body {
 
 h1 {
     margin-top: 0;
-    margin-bottom: 32px;
-    font-size: 36px;
+    margin-bottom: 36px;
+    font-size: 38px;
 }
 
 .section-title {
-    margin-top: 48px;
-    margin-bottom: 20px;
-    font-size: 24px;
+    margin-top: 50px;
+    margin-bottom: 22px;
+    font-size: 28px;
 }
 
 .nav-container,
@@ -47,7 +47,7 @@ h1 {
 .nav-container {
     grid-template-columns: repeat(
         auto-fit,
-        minmax(240px, 1fr)
+        minmax(260px, 1fr)
     );
 }
 
@@ -60,12 +60,13 @@ h1 {
 
 .card {
     display: block;
-    padding: 16px 20px;
+    padding: 18px 20px;
     border: 2px solid #000;
-    border-radius: 10px;
+    border-radius: 12px;
     text-decoration: none;
     color: #000;
     font-weight: 600;
+    font-size: 16px;
     transition:
         background 0.2s ease,
         color 0.2s ease,
@@ -75,12 +76,12 @@ h1 {
 .card:hover {
     background: #000;
     color: #fff;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 }
 
 .footer {
-    margin-top: 60px;
-    padding-top: 20px;
+    margin-top: 70px;
+    padding-top: 22px;
     border-top: 2px solid #000;
     font-size: 14px;
 }
@@ -92,7 +93,11 @@ h1 {
     }
 
     h1 {
-        font-size: 28px;
+        font-size: 30px;
+    }
+
+    .section-title {
+        font-size: 24px;
     }
 }
 
@@ -102,52 +107,57 @@ h1 {
 
 <body>
 
-<h1>📚 IELTS & Japanese Reading Library</h1>
+<h1>
+    📚 IELTS Reading Library
+</h1>
 
-<!-- ========================= -->
-<!-- Navigation -->
-<!-- ========================= -->
-
-<div class="nav-container">
-
-    <a
-        href="listening_cam10_20.html"
-        class="card"
-    >
-        🎧 Listening Cam 10–20
-    </a>
-
-    <a
-        href="Bunpro_Reading_1_50.html"
-        target="_blank"
-        class="card"
-    >
-        🇯🇵 READING PASSAGES (LESSON 1 - 50)
-    </a>
-
-  
-
-</div>
 
 <!-- ========================= -->
 <!-- IELTS Reading -->
 <!-- ========================= -->
 
 <h2 class="section-title">
-    IELTS Reading Practice
+    📖 IELTS Reading Practice
 </h2>
 
-<div id="reading-list" class="grid"></div>
+<div
+    id="reading-list"
+    class="grid"
+></div>
+
+
+<!-- ========================= -->
+<!-- Cambridge Listening -->
+<!-- ========================= -->
+
+<h2 class="section-title">
+    🎧 Cambridge Listening
+</h2>
+
+<div
+    id="listening-list"
+    class="grid"
+></div>
+
 
 <script>
 
-const container =
-    document.getElementById("reading-list");
+// =====================
+// IELTS Reading
+// =====================
 
-// Generate CAM 10 → 20
+const readingContainer =
+    document.getElementById(
+        "reading-list"
+    );
+
 for (let cam = 10; cam <= 20; cam++) {
 
-    for (let test = 1; test <= 4; test++) {
+    for (
+        let test = 1;
+        test <= 4;
+        test++
+    ) {
 
         const filename =
             `cleaned_cam${cam}_test${test}.html`;
@@ -155,21 +165,59 @@ for (let cam = 10; cam <= 20; cam++) {
         const a =
             document.createElement("a");
 
-        a.href = filename;
+        a.href =
+            filename;
 
-        a.className = "card";
+        a.target =
+            "_blank";
+
+        a.className =
+            "card";
 
         a.textContent =
             `📖 Cam ${cam} - Test ${test}`;
 
-        container.appendChild(a);
+        readingContainer
+            .appendChild(a);
     }
+}
+
+
+// =====================
+// Cambridge Listening
+// =====================
+
+const listeningContainer =
+    document.getElementById(
+        "listening-list"
+    );
+
+for (let cam = 10; cam <= 20; cam++) {
+
+    const a =
+        document.createElement("a");
+
+    a.href =
+        `cam_listening/Cambridge_${cam}.html`;
+
+    a.target =
+        "_blank";
+
+    a.className =
+        "card";
+
+    a.textContent =
+        `🎧 Cambridge ${cam}`;
+
+    listeningContainer
+        .appendChild(a);
 }
 
 </script>
 
+
 <div class="footer">
-    IELTS Practice & Japanese Reading Materials
+    IELTS Practice Reading Materials
 </div>
 
 </body>
